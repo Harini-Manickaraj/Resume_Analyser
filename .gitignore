@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Tooling
+.pytest_cache/
+.mypy_cache/
+.vscode/
+
+# Generated data and model artifacts
+models/*
+!models/.gitkeep
+data/resumes/*
+!data/resumes/.gitkeep
+data/job_descriptions/*
+!data/job_descriptions/.gitkeep
+data/datasets/*
+!data/datasets/.gitkeep
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
