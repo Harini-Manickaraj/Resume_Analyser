@@ -521,32 +521,6 @@ async def analyze_resume(
                 parsed_resume
             )
 
-        except TypeError:
-
-            # ------------------------------------------------
-            # Compatibility fallback:
-            # Some versions of the analyzer expect raw text.
-            # ------------------------------------------------
-
-            try:
-
-                result = run_resume_analysis(
-                    parsed_resume.get(
-                        "raw_text",
-                        ""
-                    )
-                )
-
-            except Exception as exc:
-
-                raise HTTPException(
-                    status_code=500,
-                    detail=(
-                        "Resume analysis failed: "
-                        f"{str(exc)}"
-                    )
-                )
-
         except Exception as exc:
 
             raise HTTPException(
@@ -558,19 +532,16 @@ async def analyze_resume(
             )
 
         # ----------------------------------------------------
-        # Return final response
+        # Return the flat formatted result directly.
+        #
+        # IMPORTANT: the frontend stores response.data as the
+        # analysis object and immediately reads fields like
+        # result.overall_score, result.candidate, result.skills
+        # etc.  Wrapping inside {"analysis": result} would
+        # require the frontend to unwrap it — avoid that.
         # ----------------------------------------------------
 
-        return {
-
-            "success": True,
-
-            "filename": file.filename,
-
-            "resume": parsed_resume,
-
-            "analysis": result
-        }
+        return result
 
     except HTTPException:
 

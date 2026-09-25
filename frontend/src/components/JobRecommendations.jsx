@@ -1,158 +1,93 @@
 import React from "react";
+import { BriefcaseBusiness, ArrowUpRight, MapPin, Building2 } from "lucide-react";
 
-import {
-    BriefcaseBusiness,
-    ArrowUpRight
-} from "lucide-react";
+// Classify match percentage into tier
+function getMatchTier(score) {
+    if (score >= 70) return "high";
+    if (score >= 40) return "medium";
+    return "low";
+}
 
-
-function JobRecommendations({
-    jobs = []
-}) {
-
+function JobRecommendations({ jobs = [] }) {
     return (
-
         <section className="dashboard-section">
-
             <div className="section-title">
-
                 <div>
-
-                    <p className="eyebrow">
-                        JOB MATCHING
-                    </p>
-
-                    <h2>
-                        Recommended Jobs
-                    </h2>
-
+                    <p className="eyebrow">JOB MATCHING</p>
+                    <h2>Recommended Jobs</h2>
                 </div>
-
                 <span className="result-count">
-                    {jobs.length} matches
+                    {jobs.length} {jobs.length === 1 ? "match" : "matches"}
                 </span>
-
             </div>
 
-
             {jobs.length === 0 ? (
-
                 <div className="empty-state">
-
-                    <BriefcaseBusiness
-                        size={32}
-                    />
-
-                    <p>
-                        No job recommendations
-                        available yet.
-                    </p>
-
+                    <div className="empty-state-icon">
+                        <BriefcaseBusiness size={26} />
+                    </div>
+                    <p>No job recommendations available yet.</p>
                 </div>
-
             ) : (
-
                 <div className="job-list">
+                    {jobs.map((job, index) => {
+                        const score = Number(job.match_percentage || 0);
+                        const tier  = getMatchTier(score);
+                        const label = job.classification || (
+                            tier === "high"   ? "Excellent Match" :
+                            tier === "medium" ? "Good Match"      : "Partial Match"
+                        );
 
-                    {jobs.map(
-                        (job, index) => {
-
-                            const score =
-                                Number(
-                                    job.match_percentage ||
-                                    0
-                                );
-
-                            return (
-
-                                <div
-                                    className="job-card"
-                                    key={
-                                        job.job_id ||
-                                        index
-                                    }
-                                >
-
-                                    <div className="job-rank">
-                                        #{index + 1}
-                                    </div>
-
-
-                                    <div className="job-icon">
-                                        <BriefcaseBusiness
-                                            size={20}
-                                        />
-                                    </div>
-
-
-                                    <div className="job-info">
-
-                                        <h3>
-                                            {
-                                                job.job_title ||
-                                                "Unknown Position"
-                                            }
-                                        </h3>
-
-                                        <span>
-                                            {
-                                                job.job_id ||
-                                                "JOB"
-                                            }
-                                        </span>
-
-
-                                        <div className="progress-bar">
-
-                                            <div
-                                                className="progress-fill"
-                                                style={{
-                                                    width:
-                                                        `${Math.min(
-                                                            score,
-                                                            100
-                                                        )}%`
-                                                }}
-                                            />
-
-                                        </div>
-
-                                    </div>
-
-
-                                    <div className="job-score">
-
-                                        <strong>
-                                            {score.toFixed(1)}%
-                                        </strong>
-
-                                        <span>
-                                            {
-                                                job.classification ||
-                                                "Match"
-                                            }
-                                        </span>
-
-                                    </div>
-
-
-                                    <ArrowUpRight
-                                        size={20}
-                                        className="job-arrow"
-                                    />
-
+                        return (
+                            <div
+                                className="job-card"
+                                key={job.job_id || index}
+                                role="listitem"
+                            >
+                                {/* Rank badge */}
+                                <div className={`job-rank${index === 0 ? " top" : ""}`}>
+                                    #{index + 1}
                                 </div>
 
-                            );
-                        }
-                    )}
+                                {/* Icon */}
+                                <div className="job-icon">
+                                    <BriefcaseBusiness size={18} />
+                                </div>
 
+                                {/* Title + progress */}
+                                <div className="job-info">
+                                    <h3>{job.job_title || "Unknown Position"}</h3>
+                                    <div className="job-info-meta">
+                                        {job.job_id || "JOB"}
+                                    </div>
+                                    <div className="progress-bar">
+                                        <div
+                                            className={`progress-fill ${tier}`}
+                                            style={{ width: `${Math.min(score, 100)}%` }}
+                                            role="progressbar"
+                                            aria-valuenow={score}
+                                            aria-valuemin={0}
+                                            aria-valuemax={100}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Score + label */}
+                                <div className="job-score">
+                                    <strong>{score.toFixed(1)}%</strong>
+                                    <span className={`job-score-label ${tier}`}>
+                                        {label}
+                                    </span>
+                                </div>
+
+                                <ArrowUpRight size={18} className="job-arrow" />
+                            </div>
+                        );
+                    })}
                 </div>
             )}
-
         </section>
     );
 }
-
 
 export default JobRecommendations;

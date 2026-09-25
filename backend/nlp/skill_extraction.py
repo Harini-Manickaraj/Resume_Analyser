@@ -24,15 +24,25 @@ SKILL_FILE = DATA_DIR / "skill_dictionary.csv"
 # Load skill dictionary
 # ------------------------------------------------------------
 
-def load_skill_dictionary():
+def load_skill_dictionary(path=None):
+    """
+    Load the skill dictionary CSV.
 
-    if not SKILL_FILE.exists():
+    Parameters
+    ----------
+    path : str or Path, optional
+        Explicit path to the CSV file.
+        Defaults to the module-level SKILL_FILE constant.
+    """
 
+    target = Path(path) if path else SKILL_FILE
+
+    if not target.exists():
         raise FileNotFoundError(
-            f"Skill dictionary not found:\n{SKILL_FILE}"
+            f"Skill dictionary not found:\n{target}"
         )
 
-    skill_df = pd.read_csv(SKILL_FILE)
+    skill_df = pd.read_csv(target)
 
     return skill_df
 
