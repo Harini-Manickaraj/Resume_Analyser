@@ -7,4 +7,3 @@ numpy
 scikit-learn
 nltk
 spacy
-sentence-transformers

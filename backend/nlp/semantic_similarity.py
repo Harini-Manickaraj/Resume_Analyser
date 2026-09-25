@@ -1,20 +1,15 @@
-import sys
 from pathlib import Path
 
 import pandas as pd
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 
 # ============================================================
 # AI BASED RESUME INTELLIGENCE AND JOB RECOMMENDATION SYSTEM
-# SEMANTIC SIMILARITY MODULE
+# LIGHTWEIGHT SEMANTIC SIMILARITY MODULE
 # ============================================================
 
-
-# ------------------------------------------------------------
-# Project paths
-# ------------------------------------------------------------
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
@@ -30,54 +25,21 @@ OUTPUT_FILE = OUTPUT_DIR / "semantic_similarity_results.csv"
 
 
 # ------------------------------------------------------------
-# Sentence Transformer model
-# ------------------------------------------------------------
-
-MODEL_NAME = "all-MiniLM-L6-v2"
-
-
-# ------------------------------------------------------------
-# Load model
-# ------------------------------------------------------------
-
-def load_model():
-
-    print("\nLoading Sentence Transformer model...")
-
-    model = SentenceTransformer(MODEL_NAME)
-
-    print(
-        f"✓ Model loaded: {MODEL_NAME}"
-    )
-
-    return model
-
-
-# ------------------------------------------------------------
 # Build resume text
 # ------------------------------------------------------------
 
 def build_resume_text(row):
 
     sections = [
-
         str(row.get("summary", "")),
-
         str(row.get("skills", "")),
-
         str(row.get("education", "")),
-
         str(row.get("project_skills", "")),
-
         str(row.get("certifications", "")),
-
         str(row.get("soft_skills", ""))
-
     ]
 
-    text = " ".join(sections)
-
-    return text.strip()
+    return " ".join(sections).strip()
 
 
 # ------------------------------------------------------------
@@ -87,56 +49,21 @@ def build_resume_text(row):
 def build_job_text(row):
 
     sections = [
-
         str(row.get("job_title", "")),
-
         str(row.get("domain", "")),
-
         str(row.get("required_skills", "")),
-
         str(row.get("education_required", "")),
-
         str(row.get("responsibilities", ""))
-
     ]
 
-    text = " ".join(sections)
-
-    return text.strip()
+    return " ".join(sections).strip()
 
 
 # ------------------------------------------------------------
-# Calculate cosine similarity
+# Generate semantic matches
 # ------------------------------------------------------------
 
-def calculate_similarity(
-    resume_embedding,
-    job_embedding
-):
-
-    similarity = cosine_similarity(
-        [resume_embedding],
-        [job_embedding]
-    )[0][0]
-
-    # Convert from 0–1 to percentage
-    similarity_percentage = similarity * 100
-
-    return round(
-        similarity_percentage,
-        2
-    )
-
-
-# ------------------------------------------------------------
-# Main semantic matching process
-# ------------------------------------------------------------
-
-def generate_semantic_matches(
-    resume_df,
-    job_df,
-    model
-):
+def generate_semantic_matches(resume_df, job_df):
 
     print("\nPreparing resume text...")
 
@@ -145,9 +72,7 @@ def generate_semantic_matches(
         for _, row in resume_df.iterrows()
     ]
 
-    print(
-        f"✓ Prepared {len(resume_texts)} resume(s)"
-    )
+    print(f"✓ Prepared {len(resume_texts)} resume(s)")
 
     print("\nPreparing job description text...")
 
@@ -156,39 +81,39 @@ def generate_semantic_matches(
         for _, row in job_df.iterrows()
     ]
 
-    print(
-        f"✓ Prepared {len(job_texts)} job descriptions"
-    )
+    print(f"✓ Prepared {len(job_texts)} job descriptions")
 
     # --------------------------------------------------------
-    # Generate embeddings
+    # Combine texts for one shared TF-IDF vocabulary
     # --------------------------------------------------------
 
-    print("\nGenerating resume embeddings...")
+    all_texts = resume_texts + job_texts
 
-    resume_embeddings = model.encode(
-        resume_texts,
-        convert_to_numpy=True,
-        show_progress_bar=True
+    print("\nGenerating TF-IDF vectors...")
+
+    vectorizer = TfidfVectorizer(
+        stop_words="english",
+        max_features=5000
     )
 
-    print("✓ Resume embeddings generated")
+    tfidf_matrix = vectorizer.fit_transform(all_texts)
 
-    print("\nGenerating job embeddings...")
+    resume_vectors = tfidf_matrix[:len(resume_texts)]
 
-    job_embeddings = model.encode(
-        job_texts,
-        convert_to_numpy=True,
-        show_progress_bar=True
-    )
+    job_vectors = tfidf_matrix[len(resume_texts):]
 
-    print("✓ Job embeddings generated")
+    print("✓ TF-IDF vectors generated")
 
     # --------------------------------------------------------
-    # Compare every resume against every job
+    # Calculate similarity matrix
     # --------------------------------------------------------
 
     print("\nCalculating semantic similarities...")
+
+    similarity_matrix = cosine_similarity(
+        resume_vectors,
+        job_vectors
+    )
 
     results = []
 
@@ -196,9 +121,8 @@ def generate_semantic_matches(
 
         for job_index, job_row in job_df.iterrows():
 
-            similarity = calculate_similarity(
-                resume_embeddings[resume_index],
-                job_embeddings[job_index]
+            similarity = (
+                similarity_matrix[resume_index][job_index] * 100
             )
 
             results.append({
@@ -213,7 +137,7 @@ def generate_semantic_matches(
                     job_row["job_title"],
 
                 "semantic_similarity":
-                    similarity
+                    round(float(similarity), 2)
             })
 
     return pd.DataFrame(results)
@@ -227,21 +151,13 @@ if __name__ == "__main__":
 
     print("=" * 70)
     print("AI RESUME INTELLIGENCE SYSTEM")
-    print("SEMANTIC SIMILARITY ENGINE")
+    print("TF-IDF SEMANTIC SIMILARITY ENGINE")
     print("=" * 70)
-
-    # --------------------------------------------------------
-    # Create output directory
-    # --------------------------------------------------------
 
     OUTPUT_DIR.mkdir(
         parents=True,
         exist_ok=True
     )
-
-    # --------------------------------------------------------
-    # Check input files
-    # --------------------------------------------------------
 
     if not RESUME_FILE.exists():
 
@@ -255,10 +171,6 @@ if __name__ == "__main__":
             f"Job dataset not found:\n{JOB_FILE}"
         )
 
-    # --------------------------------------------------------
-    # Load datasets
-    # --------------------------------------------------------
-
     print("\nLoading datasets...")
 
     resume_df = pd.read_csv(
@@ -269,33 +181,13 @@ if __name__ == "__main__":
         JOB_FILE
     )
 
-    print(
-        f"✓ Resumes: {len(resume_df)}"
-    )
-
-    print(
-        f"✓ Jobs: {len(job_df)}"
-    )
-
-    # --------------------------------------------------------
-    # Load model
-    # --------------------------------------------------------
-
-    model = load_model()
-
-    # --------------------------------------------------------
-    # Generate semantic matches
-    # --------------------------------------------------------
+    print(f"✓ Resumes: {len(resume_df)}")
+    print(f"✓ Jobs: {len(job_df)}")
 
     results = generate_semantic_matches(
         resume_df,
-        job_df,
-        model
+        job_df
     )
-
-    # --------------------------------------------------------
-    # Save results
-    # --------------------------------------------------------
 
     results.to_csv(
         OUTPUT_FILE,
@@ -303,13 +195,8 @@ if __name__ == "__main__":
     )
 
     print(
-        f"\n✓ Results saved to:\n"
-        f"{OUTPUT_FILE}"
+        f"\n✓ Results saved to:\n{OUTPUT_FILE}"
     )
-
-    # --------------------------------------------------------
-    # Display top matches
-    # --------------------------------------------------------
 
     print("\n" + "=" * 70)
     print("TOP SEMANTIC JOB MATCHES")

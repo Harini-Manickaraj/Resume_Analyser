@@ -102,6 +102,19 @@ def get_semantic_model():
 # =========================================================
 # SEMANTIC SIMILARITY
 # =========================================================
+# =========================================================
+# SEMANTIC SIMILARITY
+# Lightweight TF-IDF + Cosine Similarity
+# =========================================================
+
+def get_semantic_model():
+    """
+    Compatibility function.
+    SentenceTransformer is intentionally not used because
+    the large ML dependency is unsuitable for Vercel.
+    """
+    return None
+
 
 def calculate_semantic_similarity(
     resume_text: str,
@@ -109,32 +122,48 @@ def calculate_semantic_similarity(
     model=None,
 ) -> float:
     """
-    Cosine similarity via Sentence Transformers.
-    Falls back to a simple token-overlap (TF-IDF-like) score
-    when the model is unavailable.
+    Calculate text similarity using TF-IDF + cosine similarity.
+
+    Returns a score between 0 and 1.
     """
+
     if not resume_text.strip() or not job_text.strip():
         return 0.0
 
-    if model is not None:
-        try:
-            from sklearn.metrics.pairwise import cosine_similarity
-            r_emb = model.encode([resume_text])
-            j_emb = model.encode([job_text])
-            score = float(cosine_similarity(r_emb, j_emb)[0][0])
-            return max(0.0, score)
-        except Exception:
-            pass  # fall through to lexical fallback
+    try:
+        from sklearn.feature_extraction.text import TfidfVectorizer
+        from sklearn.metrics.pairwise import cosine_similarity
 
-    # --- Lexical fallback (token overlap Jaccard) ---
-    r_tokens = set(resume_text.lower().split())
-    j_tokens = set(job_text.lower().split())
-    if not j_tokens:
-        return 0.0
-    overlap = r_tokens & j_tokens
-    return len(overlap) / len(j_tokens | r_tokens)
+        vectorizer = TfidfVectorizer(
+            stop_words="english",
+            max_features=5000
+        )
 
+        tfidf_matrix = vectorizer.fit_transform(
+            [resume_text, job_text]
+        )
 
+        score = float(
+            cosine_similarity(
+                tfidf_matrix[0:1],
+                tfidf_matrix[1:2]
+            )[0][0]
+        )
+
+        return max(0.0, min(1.0, score))
+
+    except Exception:
+        # Simple lexical fallback
+        resume_tokens = set(resume_text.lower().split())
+        job_tokens = set(job_text.lower().split())
+
+        if not resume_tokens or not job_tokens:
+            return 0.0
+
+        intersection = len(resume_tokens & job_tokens)
+        union = len(resume_tokens | job_tokens)
+
+        return intersection / union if union else 0.0
 # =========================================================
 # BUILD TEXT REPRESENTATIONS
 # =========================================================
