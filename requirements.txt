@@ -1,9 +1,7 @@
 fastapi
-uvicorn
 python-multipart
 PyMuPDF
 pandas
 numpy
 scikit-learn
 nltk
-spacy
