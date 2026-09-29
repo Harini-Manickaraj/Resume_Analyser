@@ -22,6 +22,10 @@ data/job_descriptions/*
 !data/job_descriptions/.gitkeep
 data/datasets/*
 !data/datasets/.gitkeep
+!data/datasets/skill_dictionary.csv
+!data/datasets/resume_profiles.csv
+!data/datasets/job_descriptions.csv
+!data/datasets/initial_matching_labels.csv
 
 # Frontend
 frontend/node_modules/

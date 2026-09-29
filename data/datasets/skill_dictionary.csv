@@ -1,0 +1,29 @@
+canonical_skill,aliases,category
+Python,python,programming
+SQL,sql,database
+Machine Learning,machine learning;ml,ai_ml
+Deep Learning,deep learning;dl,ai_ml
+Natural Language Processing,natural language processing;nlp,ai_ml
+Scikit-learn,scikit-learn;sklearn,library
+Pandas,pandas,library
+NumPy,numpy,library
+XGBoost,xgboost,machine_learning
+Django,django,framework
+FastAPI,fastapi,framework
+PyTorch,pytorch,framework
+TensorFlow,tensorflow,framework
+Matplotlib,matplotlib,visualization
+Power BI,power bi,visualization
+Tableau,tableau,visualization
+Docker,docker,devops
+Kubernetes,kubernetes,devops
+AWS,aws;amazon web services,cloud
+Git,git,developer_tool
+GitHub,github,developer_tool
+Excel,excel;microsoft excel,analytics_tool
+PostgreSQL,postgresql;postgres,database
+ETL,etl;extract transform load,data_engineering
+Spark,spark;apache spark,data_engineering
+Airflow,airflow;apache airflow,data_engineering
+MLflow,mlflow,mlops
+Statistics,statistics;statistical analysis,analytics

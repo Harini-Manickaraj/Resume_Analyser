@@ -1,0 +1,21 @@
+candidate_id,job_id,skill_overlap_score,education_match,experience_match,initial_expert_score,initial_label,matched_skills,missing_skills
+CAND_001,JD001,66.7,100.0,100.0,66.7,moderate_match,numpy;pandas;python;sql,data visualization;excel
+CAND_001,JD002,50.0,70.0,100.0,51.5,weak_match,pandas;python;sql,excel;power bi;statistics
+CAND_001,JD003,71.4,100.0,50.0,64.3,moderate_match,numpy;pandas;python;scikit-learn;sql,machine learning;statistics
+CAND_001,JD004,83.3,100.0,100.0,75.8,strong_match,git;numpy;pandas;python;scikit-learn,machine learning
+CAND_001,JD005,33.3,100.0,100.0,48.3,weak_match,git;python,docker;machine learning;pytorch;tensorflow
+CAND_001,JD006,57.1,100.0,100.0,63.6,moderate_match,django;git;python;sql,css;html;rest api
+CAND_001,JD007,42.9,100.0,50.0,50.7,weak_match,django;git;python,docker;fastapi;postgresql;rest api
+CAND_001,JD008,42.9,100.0,100.0,53.6,weak_match,git;python;sql,airflow;aws;etl;spark
+CAND_001,JD009,20.0,100.0,100.0,41.0,weak_match,sql,data visualization;excel;power bi;statistics
+CAND_001,JD010,42.9,100.0,100.0,53.6,weak_match,git;python;sql,nlp;nltk;spacy;transformers
+CAND_001,JD011,33.3,100.0,100.0,48.3,weak_match,numpy;python,cnn;deep learning;pytorch;tensorflow
+CAND_001,JD012,50.0,100.0,100.0,57.5,moderate_match,git;python;sql,aws;docker;etl
+CAND_001,JD013,42.9,100.0,100.0,53.6,weak_match,git;python;sql,algorithms;c++;data structures;java
+CAND_001,JD014,66.7,100.0,100.0,66.7,moderate_match,numpy;pandas;python;scikit-learn,machine learning;statistics
+CAND_001,JD015,50.0,100.0,100.0,57.5,moderate_match,matplotlib;python;sql,excel;power bi;tableau
+CAND_001,JD016,83.3,100.0,100.0,78.3,strong_match,pandas;python;scikit-learn;sql;xgboost,statistics
+CAND_001,JD017,57.1,100.0,100.0,63.6,moderate_match,django;git;python;sql,javascript;react;rest api
+CAND_001,JD018,40.0,100.0,100.0,52.0,weak_match,python;sql,database design;excel;postgresql
+CAND_001,JD019,28.6,100.0,100.0,45.7,weak_match,git;python,aws;docker;kubernetes;machine learning;mlflow
+CAND_001,JD020,50.0,100.0,50.0,52.5,weak_match,pandas;python;sql,data visualization;experimentation;statistics
